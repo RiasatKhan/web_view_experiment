@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -30,34 +31,106 @@ class InAppWebViewPage extends StatefulWidget {
 }
 
 class _InAppWebViewPageState extends State<InAppWebViewPage> {
-  InAppWebViewController _webViewController;
+  InAppWebViewController webView;
+
+  // Future<bool> _goBack() async {
+  //   if (await _webViewController.canGoBack()) {
+  //     print("Sakif");
+  //     _webViewController.goBack();
+  //     return Future.value(true);
+  //   } else {
+  //     Scaffold.of(context).showSnackBar(
+  //       const SnackBar(content: Text("No back history item")),
+  //     );
+  //     return Future.value(false);
+  //   }
+  // }
+
+  Future<bool> _onBack() async {
+    bool goBack;
+
+    var value = await webView.canGoBack(); // check webview can go back
+    var url = await webView.getUrl();
+    if (value && url != "https://doctor-dev.takemed.com.bd/portal") {
+      webView.goBack(); // perform webview back operation
+      print(url);
+      return false;
+    } else {
+      await showDialog(
+        context: context,
+        builder: (context) => new AlertDialog(
+          title:
+              new Text('Confirmation ', style: TextStyle(color: Colors.purple)),
+
+          // Are you sure?
+
+          content: new Text('Do you want exit app ? '),
+
+          // Do you want to go back?
+
+          actions: <Widget>[
+            new FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+
+                setState(() {
+                  goBack = false;
+                });
+              },
+
+              child: new Text("No"), // No
+            ),
+            new FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                setState(() {
+                  goBack = true;
+                });
+                SystemNavigator.pop();
+              },
+
+              child: new Text("Yes"), // Yes
+            ),
+          ],
+        ),
+      );
+
+      if (goBack) Navigator.pop(context); // If user press Yes pop the page
+
+      return goBack;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-            child: Column(children: <Widget>[
-      Expanded(
-        child: Container(
-          child: InAppWebView(
-              initialUrl: "https://doctor-dev.takemed.com.bd/",
-              initialOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                  mediaPlaybackRequiresUserGesture: false,
-                  debuggingEnabled: true,
-                ),
-              ),
-              onWebViewCreated: (InAppWebViewController controller) {
-                _webViewController = controller;
-              },
-              androidOnPermissionRequest: (InAppWebViewController controller,
-                  String origin, List<String> resources) async {
-                return PermissionRequestResponse(
-                    resources: resources,
-                    action: PermissionRequestResponseAction.GRANT);
-              }),
-        ),
-      ),
-    ])));
+    return WillPopScope(
+        onWillPop: _onBack,
+        child: Scaffold(
+            body: Container(
+                child: Column(children: <Widget>[
+          Expanded(
+            child: Container(
+              child: InAppWebView(
+                  initialUrl: "https://doctor-dev.takemed.com.bd/",
+                  initialOptions: InAppWebViewGroupOptions(
+                    crossPlatform: InAppWebViewOptions(
+                      mediaPlaybackRequiresUserGesture: false,
+                      debuggingEnabled: true,
+                    ),
+                  ),
+                  onWebViewCreated: (InAppWebViewController controller) {
+                    webView = controller;
+                  },
+                  androidOnPermissionRequest:
+                      (InAppWebViewController controller, String origin,
+                          List<String> resources) async {
+                    return PermissionRequestResponse(
+                        resources: resources,
+                        action: PermissionRequestResponseAction.GRANT);
+                  }),
+            ),
+          ),
+        ]))));
   }
 }
