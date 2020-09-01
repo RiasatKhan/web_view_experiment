@@ -51,11 +51,9 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
 
     var value = await webView.canGoBack(); // check webview can go back
     var url = await webView.getUrl();
-    if (value && url != "https://doctor-dev.takemed.com.bd/portal") {
-      webView.goBack(); // perform webview back operation
-      print(url);
-      return false;
-    } else {
+    print(url);
+    if (url == "https://doctor-dev.takemed.com.bd/portal" ||
+        url == "https://doctor-dev.takemed.com.bd/") {
       await showDialog(
         context: context,
         builder: (context) => new AlertDialog(
@@ -99,6 +97,10 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
       if (goBack) Navigator.pop(context); // If user press Yes pop the page
 
       return goBack;
+    } else if (value) {
+      webView.goBack(); // perform webview back operation
+      print(url);
+      return false;
     }
   }
 
