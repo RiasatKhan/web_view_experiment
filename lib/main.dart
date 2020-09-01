@@ -109,8 +109,9 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
     return WillPopScope(
         onWillPop: _onBack,
         child: Scaffold(
-            body: Container(
-                child: Column(children: <Widget>[
+            body: SafeArea(
+                child: Container(
+                    child: Column(children: <Widget>[
           Expanded(
             child: Container(
               child: InAppWebView(
@@ -133,6 +134,6 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
                   }),
             ),
           ),
-        ]))));
+        ])))));
   }
 }
