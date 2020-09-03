@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "331112635972",
+    "firebase_url": "https://takemed-71ed4.firebaseio.com",
+    "project_id": "takemed-71ed4",
+    "storage_bucket": "takemed-71ed4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331112635972:android:df39a50ba130bd158c2611",
+        "android_client_info": {
+          "package_name": "com.example.web_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "331112635972-gat3f5p51nsido0ssjqkr1et9sfr8tt1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNhrcxpdBUpDtKMzqN6EboShJY86DhZMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "331112635972-gat3f5p51nsido0ssjqkr1et9sfr8tt1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "331112635972-bcum20kcvhqsn2b95qamgbluc83trq4f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.saimongroup.takemedclient"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

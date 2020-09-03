@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'api.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +21,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,6 +41,66 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
 
   String url;
 
+
+
+
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  String _message = '';
+  var token = '';
+  
+  _registerOnFirebase() async {
+    _firebaseMessaging.subscribeToTopic('all');
+    token =  await _firebaseMessaging.getToken();
+    print('Token===============================================================================================================>>>>');
+    print(token);
+  }
+
+  @override
+  void initState() {
+    _registerOnFirebase();
+    getMessage();
+    super.initState();
+  }
+
+  void getMessage() {
+    _firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+      print('received message');
+      setState(() => _message = message["notification"]["body"]);
+    }, onResume: (Map<String, dynamic> message) async {
+      print('on resume $message');
+      setState(() => _message = message["notification"]["body"]);
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print('on launch $message');
+      setState(() => _message = message["notification"]["body"]);
+    });
+  }
+
+
+ Future <bool> callMuation() async {
+    var localStorage = _webViewController.webStorage.localStorage;
+    print('====================================================================');
+    String deviceUuid = await localStorage.getItem(key: 'deviceUuid');
+    print(deviceUuid);
+    print(setDeviceTokenForDoctor);
+     print('Token===2nd============================================================================================================>>>>');
+    print(token);
+    MutationOptions mutationOptions = MutationOptions(
+      documentNode: gql(setDeviceTokenForDoctor),
+      variables: <String, dynamic>{
+        'deviceUuid': deviceUuid,
+        'deviceToken': token
+      },
+    );
+    QueryResult result = await client.value.mutate(mutationOptions);
+    print("result ======================================================================================================>>>>>>");
+    print(result.data.toString());
+    return true;
+  }
+
+
+  
+
   Future<bool> _onBack() async {
     bool goBack;
 
@@ -44,6 +108,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
         await _webViewController.canGoBack(); // check webview can go back
     print('print url->>>>>>>>>>>>>>>>>>>>>');
     print(url);
+    
     //print (_webViewController.printCurrentPage());
     if (url == 'https://doctor-dev.takemed.com.bd/' ||
         url == 'https://doctor-dev.takemed.com.bd/portal') {
@@ -130,6 +195,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
                           setState(() {
                             this.url = url;
                           });
+                          callMuation();
                         },
                         androidOnPermissionRequest:
                             (InAppWebViewController controller, String origin,
